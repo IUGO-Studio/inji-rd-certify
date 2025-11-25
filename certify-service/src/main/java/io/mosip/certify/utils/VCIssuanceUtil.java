@@ -228,7 +228,7 @@ public class VCIssuanceUtil {
     public static Optional<CredentialMetadata> getScopeCredentialMapping(String scope, String format, CredentialIssuerMetadataDTO credentialIssuerMetadataDTO, CredentialRequest credentialRequest) {
         Map<String, CredentialConfigurationSupportedDTO> supportedCredentials = credentialIssuerMetadataDTO.getCredentialConfigurationSupportedDTO();
         Optional<Map.Entry<String, CredentialConfigurationSupportedDTO>> result = supportedCredentials.entrySet().stream()
-                .filter(cm -> cm.getValue().getScope().equals(scope) && cm.getValue().getFormat().equals(format))
+        .filter(cm -> cm.getValue().getScope().contains(scope) && cm.getValue().getFormat().equals(format))
                 .filter(cm -> {
                     CredentialConfigurationSupportedDTO dto = cm.getValue();
                     switch (format) {

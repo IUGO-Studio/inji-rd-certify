@@ -171,34 +171,34 @@ INSERT INTO certify.credential_config (
     cr_dtimes,
     upd_dtimes
 )
-VALUES (
-    'FarmerCredential',
+VALUES(
+    'DriverLicense', 
     gen_random_uuid()::VARCHAR(255),  -- generating a unique config_id
-    'active',  -- assuming an active status
-    'ewogICAgICAgICAgIkBjb250ZXh0IjogWwogICAgICAgICAgICAgICJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsCiAgICAgICAgICAgICAgImh0dHBzOi8vcGl5dXNoNzAzNC5naXRodWIuaW8vbXktZmlsZXMvZmFybWVyLmpzb24iLAogICAgICAgICAgICAgICJodHRwczovL3czaWQub3JnL3NlY3VyaXR5L3N1aXRlcy9lZDI1NTE5LTIwMjAvdjEiCiAgICAgICAgICBdLAogICAgICAgICAgImlzc3VlciI6ICIke19pc3N1ZXJ9IiwKICAgICAgICAgICJ0eXBlIjogWwogICAgICAgICAgICAgICJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsCiAgICAgICAgICAgICAgIkZhcm1lckNyZWRlbnRpYWwiCiAgICAgICAgICBdLAogICAgICAgICAgImlzc3VhbmNlRGF0ZSI6ICIke3ZhbGlkRnJvbX0iLAogICAgICAgICAgImV4cGlyYXRpb25EYXRlIjogIiR7dmFsaWRVbnRpbH0iLAogICAgICAgICAgImNyZWRlbnRpYWxTdWJqZWN0IjogewogICAgICAgICAgICAgICJpZCI6ICIke19ob2xkZXJJZH0iLAogICAgICAgICAgICAgICJmdWxsTmFtZSI6ICIke2Z1bGxOYW1lfSIsCiAgICAgICAgICAgICAgIm1vYmlsZU51bWJlciI6ICIke21vYmlsZU51bWJlcn0iLAogICAgICAgICAgICAgICJkYXRlT2ZCaXJ0aCI6ICIke2RhdGVPZkJpcnRofSIsCiAgICAgICAgICAgICAgImdlbmRlciI6ICIke2dlbmRlcn0iLAogICAgICAgICAgICAgICJzdGF0ZSI6ICIke3N0YXRlfSIsCiAgICAgICAgICAgICAgImRpc3RyaWN0IjogIiR7ZGlzdHJpY3R9IiwKICAgICAgICAgICAgICAidmlsbGFnZU9yVG93biI6ICIke3ZpbGxhZ2VPclRvd259IiwKICAgICAgICAgICAgICAicG9zdGFsQ29kZSI6ICIke3Bvc3RhbENvZGV9IiwKICAgICAgICAgICAgICAibGFuZEFyZWEiOiAiJHtsYW5kQXJlYX0iLAogICAgICAgICAgICAgICJsYW5kT3duZXJzaGlwVHlwZSI6ICIke2xhbmRPd25lcnNoaXBUeXBlfSIsCiAgICAgICAgICAgICAgInByaW1hcnlDcm9wVHlwZSI6ICIke3ByaW1hcnlDcm9wVHlwZX0iLAogICAgICAgICAgICAgICJzZWNvbmRhcnlDcm9wVHlwZSI6ICIke3NlY29uZGFyeUNyb3BUeXBlfSIsCiAgICAgICAgICAgICAgImZhY2UiOiAiJHtmYWNlfSIsCiAgICAgICAgICAgICAgImZhcm1lcklEIjogIiR7ZmFybWVySUR9IgogICAgICAgICAgfQogICAgIH0=',  -- the VC template from the JSON
+    'active', 
+    'ewogICAgIkBjb250ZXh0IjogWwogICAgICAgICJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsCiAgICAgICAgImh0dHBzOi8vYW5kcmVzYnU5My5naXRodWIuaW8vaW5qaS1mYXJtZXItcG9jL2RpZC1yZC9kaWQuanNvbiIsCiAgICAgICAgImh0dHBzOi8vdzNpZC5vcmcvc2VjdXJpdHkvc3VpdGVzL2VkMjU1MTktMjAyMC92MSIKICAgIF0sCiAgICAiQHR5cGUiOiBbCiAgICAgICAgIlZlcmlmaWFibGVDcmVkZW50aWFsIiwKICAgICAgICAiRHJpdmVyTGljZW5zZSIKICAgIF0sCiAgICAiaXNzdWVyIjogIiR7X2lzc3Vlcn0iLAogICAgImlzc3VhbmNlRGF0ZSI6ICIke3ZhbGlkRnJvbX0iLAogICAgImV4cGlyYXRpb25EYXRlIjogIiR7dmFsaWRVbnRpbH0iLAogICAgICJ2YWxpZEZyb20iOiAiJHt2YWxpZEZyb219IiwKICAgICJ2YWxpZFVudGlsIjogIiR7dmFsaWRVbnRpbH0iLAogICAgImNyZWRlbnRpYWxTdWJqZWN0IjogewogICAgICAgICJuYXRpb25hbF9pZCI6ICIke25hdGlvbmFsX2lkfSIsCiAgICAgICAgImZ1bGxfbmFtZSI6ICIke2Z1bGxfbmFtZX0iLAogICAgICAgICJlbWFpbF9mb3JfYXV0aCI6ICIke2VtYWlsX2Zvcl9hdXRofSIsCiAgICAgICAgImFkZHJlc3MiOiAiJHthZGRyZXNzfSIsCiAgICAgICAgImhlaWdodCI6ICIke2hlaWdodH0iLAogICAgICAgICJ3ZWlnaHQiOiAiJHt3ZWlnaHR9IiwKICAgICAgICAic2V4IjogIiR7c2V4fSIsCiAgICAgICAgImJsb29kX3R5cGUiOiAiJHtibG9vZF90eXBlfSIsCiAgICAgICAgImJpcnRoX2RhdGUiOiAiJHtiaXJ0aF9kYXRlfSIsCiAgICAgICAgImlzc3VlX2RhdGUiOiAiJHtpc3N1ZV9kYXRlfSIsCiAgICAgICAgImV4cGlyYXRpb25fZGF0ZSI6ICIke2V4cGlyYXRpb25fZGF0ZX0iLAogICAgfQp9', 
     NULL,  -- doctype from JSON
     NULL,  -- vct for SD-JWT VC
-    'https://www.w3.org/2018/credentials/v1',  -- context as comma-separated string
-    'FarmerCredential,VerifiableCredential',  -- credential_type as comma-separated string
-    'ldp_vc',  -- credential_format
-    'did:web:mosip.github.io:inji-config:vc-local-ed25519',  -- did_url
-    'CERTIFY_VC_SIGN_ED25519',  -- key_manager_app_id
-    'ED25519_SIGN',  -- key_manager_ref_id (optional)
-    'EdDSA',  -- signature_algo (optional)
-    'Ed25519Signature2020',  -- signature_crypto_suite
+    'https://www.w3.org/2018/credentials/v1', 
+    'DriverLicense,VerifiableCredential', 
+    'ldp_vc', 
+    'did:web:andresbu93.github.io:inji-farmer-poc:did-rd', 
+    'CERTIFY_VC_SIGN_ED25519', 
+    'ED25519_SIGN', 
+    'EdDSA',
+    'Ed25519Signature2020',
     NULL,  -- sd_claim (optional)
-    '[{"name": "Farmer Verifiable Credential", "locale": "en", "logo": {"url": "https://mosip.github.io/inji-config/logos/agro-vertias-logo.png", "alt_text": "Farmer Credential Logo"}, "background_color": "#12107c", "text_color": "#FFFFFF", "background_image": { "uri": "https://mosip.github.io/inji-config/logos/agro-vertias-logo.png" }}]'::JSONB,  -- display
-    ARRAY['fullName', 'mobileNumber', 'dateOfBirth', 'gender', 'state', 'district', 'villageOrTown', 'postalCode', 'landArea', 'landOwnershipType', 'primaryCropType', 'secondaryCropType', 'farmerID'],  -- display_order
-    'mock_identity_vc_ldp',  -- scope
+    '[{"logo": {"url": "https://www.intrant.gob.do/images/ImagenesPortalPrincipal/Favicon.png", "alt_text": "INTRANT Logo"}, "name": "Licencia de Conducir", "locale": "en", "text_color": "#7C4616", "background_color": "#FDFAF9", "background_image": {"uri": "https://www.intrant.gob.do/images/ImagenesPortalPrincipal/Favicon.png"}}]'::jsonb,
+    ARRAY['national_id', 'full_name', 'address', 'height', 'weight', 'sex', 'blood_type', 'birth_date', 'issue_date', 'expiration_date'],  -- display_order
+    'openid offline_access profile email',
     ARRAY['did:jwk'],  -- cryptographic_binding_methods_supported
     ARRAY['Ed25519Signature2020'],  -- credential_signing_alg_values_supported
-    '{"jwt": {"proof_signing_alg_values_supported": ["RS256", "ES256"]}}'::JSONB,  -- proof_types_supported
-    '{"fullName": {"display": [{"name": "Full Name", "locale": "en"}]}, "phone": {"display": [{"name": "Phone Number", "locale": "en"}]}, "dateOfBirth": {"display": [{"name": "Date of Birth", "locale": "en"}]}, "gender": {"display": [{"name": "Gender", "locale": "en"}]}}'::JSONB,  -- credential_subject
-    NULL,  -- claims (optional)
-    '[{"mosip.certify.mock.data-provider.csv.identifier-column": "id", "mosip.certify.mock.data-provider.csv.data-columns": "id,fullName,mobileNumber,dateOfBirth,gender,state,district,villageOrTown,postalCode,landArea,landOwnershipType,primaryCropType,secondaryCropType,face,farmerID", "mosip.certify.mock.data-provider.csv-registry-uri": "/home/mosip/config/farmer_identity_data.csv"}]'::JSONB,  -- plugin_configurations
+    '{"jwt": {"proof_signing_alg_values_supported": ["RS256", "ES256"]}}'::jsonb, 
+    '{"sex": {"display": [{"name": "Sexo", "locale": "en"}]}, "height": {"display": [{"name": "Estatura", "locale": "en"}]}, "weight": {"display": [{"name": "Peso", "locale": "en"}]}, "address": {"display": [{"name": "Direcci&oacute;n", "locale": "en"}]}, "full_name": {"display": [{"name": "Nombre Completo", "locale": "en"}]}, "birth_date": {"display": [{"name": "Nacimiento", "locale": "en"}]}, "blood_type": {"display": [{"name": "Tipo de Sangre", "locale": "en"}]}, "issue_date": {"display": [{"name": "Emisi&oacute;n", "locale": "en"}]}, "national_id": {"display": [{"name": "C&eacute;dula", "locale": "en"}]}, "expiration_date": {"display": [{"name": "Vence", "locale": "en"}]}}'::JSONB,  -- credential_subject 
+    NULL, 
+    '[{"mosip.certify.mock.data-provider.csv-registry-uri": "/home/mosip/config/farmer_identity_data.csv", "mosip.certify.mock.data-provider.csv.data-columns": "id,fullName,mobileNumber,dateOfBirth,gender,state,district,villageOrTown,postalCode,landArea,landOwnershipType,primaryCropType,secondaryCropType,face,farmerID", "mosip.certify.mock.data-provider.csv.identifier-column": "id"}]'::jsonb, 
     ARRAY['revocation'],  -- credential_status_purpose
     NOW(),  -- cr_dtimes
-    NULL  -- upd_dtimes (optional)
+    NULL
 );
 
 INSERT INTO certify.key_policy_def(APP_ID,KEY_VALIDITY_DURATION,PRE_EXPIRE_DAYS,ACCESS_ALLOWED,IS_ACTIVE,CR_BY,CR_DTIMES) VALUES('ROOT', 2920, 1125, 'NA', true, 'mosipadmin', now());
