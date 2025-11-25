@@ -6,6 +6,7 @@
 - [SD-JWT VC Support](./SD-JWT-Support.md)
 - [Data Integrity Proof Support](./Data-Integrity-Proof-Support.md)
 - [VC Revocation Support](./VC-Revocation-Support.md)
+- [Certify Configuration for CuentaDigital Integration](./CERTIFY-CONFIGURATION.md)
 
 # Integrator READMEs
 
