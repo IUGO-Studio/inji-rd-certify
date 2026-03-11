@@ -187,7 +187,7 @@ VALUES(
     'EdDSA',
     'Ed25519Signature2020',
     NULL,  -- sd_claim (optional)
-    '[{"logo": {"url": "https://yt3.googleusercontent.com/D77-FpYNthYQkj1ppBgjZF49GrR3GoLqJAox_9ADgDETBc6EYUVgqYsGtT-BKRJb14TygOvuEA=s900-c-k-c0x00ffffff-no-rj", "alt_text": "INTRANT Logo"}, "name": "Licencia de Conducir", "locale": "en", "text_color": "#7C4616", "background_color": "#FDFAF9", "background_image": {"uri": "https://www.intrant.gob.do/images/ImagenesPortalPrincipal/Favicon.png"}}]'::jsonb,
+    '[{"logo": {"url": "https://yt3.googleusercontent.com/D77-FpYNthYQkj1ppBgjZF49GrR3GoLqJAox_9ADgDETBc6EYUVgqYsGtT-BKRJb14TygOvuEA=s900-c-k-c0x00ffffff-no-rj", "alt_text": "INTRANT Logo"}, "name": "Licencia de Conducir Ed25519", "locale": "en", "text_color": "#7C4616", "background_color": "#FDFAF9", "background_image": {"uri": "https://www.intrant.gob.do/images/ImagenesPortalPrincipal/Favicon.png"}}]'::jsonb,
     ARRAY['national_id', 'full_name', 'address', 'height', 'weight', 'sex', 'blood_type', 'birth_date', 'issue_date', 'expiration_date'],  -- display_order
     'openid offline_access profile email',
     ARRAY['did:jwk'],  -- cryptographic_binding_methods_supported
@@ -247,7 +247,7 @@ VALUES(
     'RS256',
     'RsaSignature2018',
     NULL,
-    '[{"logo": {"url": "https://yt3.googleusercontent.com/D77-FpYNthYQkj1ppBgjZF49GrR3GoLqJAox_9ADgDETBc6EYUVgqYsGtT-BKRJb14TygOvuEA=s900-c-k-c0x00ffffff-no-rj", "alt_text": "INTRANT Logo"}, "name": "Licencia de Conducir", "locale": "en", "text_color": "#7C4616", "background_color": "#FDFAF9", "background_image": {"uri": "https://www.intrant.gob.do/images/ImagenesPortalPrincipal/Favicon.png"}}]'::jsonb,
+    '[{"logo": {"url": "https://yt3.googleusercontent.com/D77-FpYNthYQkj1ppBgjZF49GrR3GoLqJAox_9ADgDETBc6EYUVgqYsGtT-BKRJb14TygOvuEA=s900-c-k-c0x00ffffff-no-rj", "alt_text": "INTRANT Logo"}, "name": "Licencia de Conducir RSA", "locale": "en", "text_color": "#7C4616", "background_color": "#FDFAF9", "background_image": {"uri": "https://www.intrant.gob.do/images/ImagenesPortalPrincipal/Favicon.png"}}]'::jsonb,
     ARRAY['national_id', 'full_name', 'address', 'height', 'weight', 'sex', 'blood_type', 'birth_date', 'issue_date', 'expiration_date'],
     'openid offline_access profile email',
     ARRAY['did:jwk'],
