@@ -71,7 +71,7 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
                     // new JwtClaimValidator<List<String>>(JwtClaimNames.AUD,
                     //         aud -> aud.stream().anyMatch(allowedAudiences::contains)),
                     new JwtClaimValidator<String>(JwtClaimNames.SUB, Objects::nonNull),
-                    new JwtClaimValidator<String>(Constants.CLIENT_ID, Objects::nonNull),
+                    new JwtClaimValidator<String>("azp", Objects::nonNull),
                     new JwtClaimValidator<Instant>(JwtClaimNames.IAT,
                             iat -> iat != null && iat.isBefore(Instant.now(Clock.systemUTC()))),
                     new JwtClaimValidator<Instant>(JwtClaimNames.EXP,
@@ -91,10 +91,10 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
-            //validate access token no matter if its JWT or Opaque
+            log.info("Token: {}", token);
+            
             if(isJwt(token)) {
                 try {
-                    //Verifies signature and claim predicates, If invalid throws exception
                     Jwt jwt = getNimbusJwtDecoder().decode(token);
                     parsedAccessToken.setClaims(new HashMap<>());
                     parsedAccessToken.getClaims().putAll(jwt.getClaims());
@@ -102,7 +102,6 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
                     parsedAccessToken.setActive(true);
                     filterChain.doFilter(request, response);
                     return;
-
                 } catch (Exception e) {
                     log.error("Access token validation failed", e);
                 }

@@ -240,6 +240,8 @@ public class DIDDocumentUtil {
                     return new CertifyException("No valid certificates found");
                 });
 
+        log.info("___Certificate data: {}", certificateData.getCertificateData());
+        log.info("___Key ID: {}", certificateData.getKeyId());
         CertificateResponseDTO certificateResponseDTO = new CertificateResponseDTO();
         certificateResponseDTO.setCertificateData(certificateData.getCertificateData());
         certificateResponseDTO.setKeyId(certificateData.getKeyId());
