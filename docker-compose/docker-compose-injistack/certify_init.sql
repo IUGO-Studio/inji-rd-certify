@@ -201,6 +201,66 @@ VALUES(
     NULL
 );
 
+-- DriverLicense con firma RSA (análogo al Ed25519)
+INSERT INTO certify.credential_config (
+    credential_config_key_id,
+    config_id,
+    status,
+    vc_template,
+    doctype,
+    sd_jwt_vct,
+    context,
+    credential_type,
+    credential_format,
+    did_url,
+    key_manager_app_id,
+    key_manager_ref_id,
+    signature_algo,
+    signature_crypto_suite,
+    sd_claim,
+    display,
+    display_order,
+    scope,
+    cryptographic_binding_methods_supported,
+    credential_signing_alg_values_supported,
+    proof_types_supported,
+    credential_subject,
+    mso_mdoc_claims,
+    plugin_configurations,
+    credential_status_purpose,
+    cr_dtimes,
+    upd_dtimes
+)
+VALUES(
+    'DriverLicense-RSA',
+    gen_random_uuid()::VARCHAR(255),
+    'active',
+    'eyJAY29udGV4dCI6IFsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL2FuZHJlc2J1OTMuZ2l0aHViLmlvL2luamktZmFybWVyLXBvYy9kaWQtcmQvZGlkLmpzb24iLCJodHRwczovL3czaWQub3JnL3NlY3VyaXR5L3YxIl0sInR5cGUiOiBbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiRHJpdmVyTGljZW5zZSJdLCJpc3N1ZXIiOiAiJHtfaXNzdWVyfSIsImlzc3VhbmNlRGF0ZSI6ICIke3ZhbGlkRnJvbX0iLCJleHBpcmF0aW9uRGF0ZSI6ICIke3ZhbGlkVW50aWx9IiwidmFsaWRGcm9tIjogIiR7dmFsaWRGcm9tfSIsInZhbGlkVW50aWwiOiAiJHt2YWxpZFVudGlsfSIsImNyZWRlbnRpYWxTdWJqZWN0IjogeyJuYXRpb25hbF9pZCI6ICIke25hdGlvbmFsX2lkfSIsImZ1bGxfbmFtZSI6ICIke2Z1bGxfbmFtZX0iLCJhZGRyZXNzIjogIiR7YWRkcmVzc30iLCJoZWlnaHQiOiAiJHtoZWlnaHR9Iiwid2VpZ2h0IjogIiR7d2VpZ2h0fSIsInNleCI6ICIke3NleH0iLCJibG9vZF90eXBlIjogIiR7Ymxvb2RfdHlwZX0iLCJiaXJ0aF9kYXRlIjogIiR7YmlydGhfZGF0ZX0iLCJpc3N1ZV9kYXRlIjogIiR7aXNzdWVfZGF0ZX0iLCJleHBpcmF0aW9uX2RhdGUiOiAiJHtleHBpcmF0aW9uX2RhdGV9In19',
+    NULL,
+    NULL,
+    'https://www.w3.org/2018/credentials/v1',
+    'DriverLicense-RSA,VerifiableCredential',
+    'ldp_vc',
+    'did:web:andresbu93.github.io:inji-farmer-poc:did-rd',
+    'CERTIFY_VC_SIGN_RSA',
+    '',
+    'RS256',
+    'RsaSignature2018',
+    NULL,
+    '[{"logo": {"url": "https://yt3.googleusercontent.com/D77-FpYNthYQkj1ppBgjZF49GrR3GoLqJAox_9ADgDETBc6EYUVgqYsGtT-BKRJb14TygOvuEA=s900-c-k-c0x00ffffff-no-rj", "alt_text": "INTRANT Logo"}, "name": "Licencia de Conducir", "locale": "en", "text_color": "#7C4616", "background_color": "#FDFAF9", "background_image": {"uri": "https://www.intrant.gob.do/images/ImagenesPortalPrincipal/Favicon.png"}}]'::jsonb,
+    ARRAY['national_id', 'full_name', 'address', 'height', 'weight', 'sex', 'blood_type', 'birth_date', 'issue_date', 'expiration_date'],
+    'openid offline_access profile email',
+    ARRAY['did:jwk'],
+    ARRAY['RsaSignature2018'],
+    '{"jwt": {"proof_signing_alg_values_supported": ["RS256", "ES256"]}}'::jsonb,
+    '{"sex": {"display": [{"name": "Sexo", "locale": "en"}]}, "height": {"display": [{"name": "Estatura", "locale": "en"}]}, "weight": {"display": [{"name": "Peso", "locale": "en"}]}, "address": {"display": [{"name": "Direcci&oacute;n", "locale": "en"}]}, "full_name": {"display": [{"name": "Nombre Completo", "locale": "en"}]}, "birth_date": {"display": [{"name": "Nacimiento", "locale": "en"}]}, "blood_type": {"display": [{"name": "Tipo de Sangre", "locale": "en"}]}, "issue_date": {"display": [{"name": "Emisi&oacute;n", "locale": "en"}]}, "national_id": {"display": [{"name": "C&eacute;dula", "locale": "en"}]}, "expiration_date": {"display": [{"name": "Vence", "locale": "en"}]}}'::JSONB,
+    NULL,
+    '[{"mosip.certify.mock.data-provider.csv-registry-uri": "/home/mosip/config/farmer_identity_data.csv", "mosip.certify.mock.data-provider.csv.data-columns": "id,fullName,mobileNumber,dateOfBirth,gender,state,district,villageOrTown,postalCode,landArea,landOwnershipType,primaryCropType,secondaryCropType,face,farmerID", "mosip.certify.mock.data-provider.csv.identifier-column": "id"}]'::jsonb,
+    ARRAY['revocation'],
+    NOW(),
+    NULL
+);
+
 INSERT INTO certify.key_policy_def(APP_ID,KEY_VALIDITY_DURATION,PRE_EXPIRE_DAYS,ACCESS_ALLOWED,IS_ACTIVE,CR_BY,CR_DTIMES) VALUES('ROOT', 2920, 1125, 'NA', true, 'mosipadmin', now());
 INSERT INTO certify.key_policy_def(APP_ID,KEY_VALIDITY_DURATION,PRE_EXPIRE_DAYS,ACCESS_ALLOWED,IS_ACTIVE,CR_BY,CR_DTIMES) VALUES('CERTIFY_SERVICE', 1095, 60, 'NA', true, 'mosipadmin', now());
 INSERT INTO certify.key_policy_def(APP_ID,KEY_VALIDITY_DURATION,PRE_EXPIRE_DAYS,ACCESS_ALLOWED,IS_ACTIVE,CR_BY,CR_DTIMES) VALUES('CERTIFY_PARTNER', 1095, 60, 'NA', true, 'mosipadmin', now());
