@@ -51,11 +51,16 @@ public class CredentialUtils {
                                           Map<String, String> keyReferenceDetails,
                                           ProofGenerator proofGenerator) throws CertifyException {
         Canonicalizer canonicalizer = proofGenerator.getCanonicalizer();
+        log.info("Canonicalizer: {}", canonicalizer);
+        log.info("VC LD Proof: {}", vcLdProof);
+        log.info("J: {}", j);
+        log.info("Key Reference Details: {}", keyReferenceDetails);
+        log.info("Proof Generator: {}", proofGenerator);
         byte[] vcHashBytes;
         try {
             vcHashBytes = canonicalizer.canonicalize(vcLdProof, j);
         } catch (IOException | GeneralSecurityException | JsonLDException e) {
-            log.error("Error during canonicalization", e.getMessage());
+            log.error("Error during canonicalization", e.getMessage(), e);
             throw new CertifyException("Error during canonicalization");
         }
         String vcEncodedHash = Base64.getUrlEncoder().encodeToString(vcHashBytes);
