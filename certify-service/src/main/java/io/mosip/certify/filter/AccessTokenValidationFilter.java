@@ -71,7 +71,7 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
                     // new JwtClaimValidator<List<String>>(JwtClaimNames.AUD,
                     //         aud -> aud.stream().anyMatch(allowedAudiences::contains)),
                     new JwtClaimValidator<String>(JwtClaimNames.SUB, Objects::nonNull),
-                    new JwtClaimValidator<String>("azp", Objects::nonNull),
+                    // new JwtClaimValidator<String>("azp", Objects::nonNull),
                     new JwtClaimValidator<Instant>(JwtClaimNames.IAT,
                             iat -> iat != null && iat.isBefore(Instant.now(Clock.systemUTC()))),
                     new JwtClaimValidator<Instant>(JwtClaimNames.EXP,
