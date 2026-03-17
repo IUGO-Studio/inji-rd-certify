@@ -67,8 +67,6 @@ ENV work_dir=/home/${container_user}
 
 ARG loader_path=/additional_jars/
 
-RUN mkdir -p ${loader_path} ${work_dir}/CERTIFY_PKCS12
-
 ENV loader_path_env=${loader_path}
 
 ADD configure_start.sh configure_start.sh
@@ -81,6 +79,9 @@ COPY ./target/certify-service-*.jar certify-service.jar
 
 # copy plugins from loader_path to additional_jars directory
 COPY ./loader_path/certify/*.jar ${loader_path}
+
+# copy keystore from data to CERTIFY_PKCS12 directory
+COPY ./data/CERTIFY_PKCS12 ${work_dir}/CERTIFY_PKCS12
 
 # change permissions of file inside working dir
 RUN chown -R ${container_user}:${container_user} /home/${container_user}
