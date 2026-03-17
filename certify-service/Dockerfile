@@ -79,6 +79,9 @@ RUN chmod a-w /home/${container_user}/configure_start.sh
 
 COPY ./target/certify-service-*.jar certify-service.jar
 
+# copy plugins from loader_path to additional_jars directory
+COPY ./loader_path/certify/*.jar ${loader_path}
+
 # change permissions of file inside working dir
 RUN chown -R ${container_user}:${container_user} /home/${container_user}
 
@@ -91,4 +94,3 @@ EXPOSE 9010
 ENTRYPOINT [ "./configure_start.sh" ]
 
 CMD ["java", "-jar", "-Dloader.path=${loader_path_env}", "-Dspring.cloud.config.label=${spring_config_label_env}", "-Dspring.profiles.active=${active_profile_env}", "-Dspring.cloud.config.uri=${spring_config_url_env}", "certify-service.jar"]
-

@@ -9,6 +9,8 @@
 
 # Package Files #
 *.jar
+!docker-compose/docker-compose-injistack/loader_path/certify/restapi-dataprovider-plugin-*.jar
+!certify-service/loader_path/certify/restapi-dataprovider-plugin-*.jar
 *.war
 *.nar
 *.ear
