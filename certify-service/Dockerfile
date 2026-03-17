@@ -65,9 +65,9 @@ WORKDIR /home/${container_user}
 
 ENV work_dir=/home/${container_user}
 
-ARG loader_path=${work_dir}/additional_jars/
+ARG loader_path=/additional_jars/
 
-RUN mkdir -p ${loader_path}
+RUN mkdir -p ${loader_path} ${work_dir}/CERTIFY_PKCS12
 
 ENV loader_path_env=${loader_path}
 
