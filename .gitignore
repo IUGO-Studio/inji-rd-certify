@@ -25,6 +25,7 @@ hs_err_pid*
 target/
 .idea/
 *.p12
+!certify-service/data/CERTIFY_PKCS12/local.p12
 *.iml
 .settings/
 .setting/
