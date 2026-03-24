@@ -319,6 +319,10 @@ initContainers:
 ##
 sidecars: {}
 
+## PKCS12 key manager: mosip.kernel.keymanager.hsm.config-path must live UNDER
+## persistence.mountDir (e.g. /home/mosip/config/local.p12) when persistence
+## is enabled — otherwise the .p12 is outside the PVC (e.g. CERTIFY_PKCS12/
+## under /home/mosip) and DB vs keystore drift causes KER-KMA-004 on startup.
 persistence:
   enabled: false
   ## If defined, storageClassName: <storageClass>
