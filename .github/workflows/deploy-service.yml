@@ -58,3 +58,14 @@ jobs:
           tags: |
             us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/inji-certify:latest
             us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.GAR_REPOSITORY }}/inji-certify:${{ github.sha }}
+
+      - name: 'Set up GKE credentials'
+        uses: 'google-github-actions/get-gke-credentials@v3'
+        with:
+          cluster_name: 'k8s-inji-dev'
+          location: 'us-central1-a'
+    
+      - name: Restart Kubernetes deployment
+        run: |
+          kubectl rollout restart deployment/inji-certify -n inji-certify
+          kubectl rollout status deployment/inji-certify -n inji-certify --timeout=5m
