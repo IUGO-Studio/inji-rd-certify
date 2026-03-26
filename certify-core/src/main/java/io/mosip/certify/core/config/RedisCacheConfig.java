@@ -6,6 +6,8 @@
 package io.mosip.certify.core.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -29,8 +31,25 @@ public class RedisCacheConfig {
     @Value("${mosip.certify.cache.redis.key-prefix:}")
     private String cachePrefix;
 
+    @Value("${spring.data.redis.host:}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port:0}")
+    private Integer redisPort;
+
+    @Value("${spring.data.redis.ssl.enabled:false}")
+    private Boolean redisSslEnabled;
+
+    @Value("${spring.data.redis.username:}")
+    private String redisUsername;
+
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
+        log.info("Redis cache config loaded. host: {}, port: {}, ssl: {}, usernameConfigured: {}",
+                redisHost,
+                redisPort,
+                redisSslEnabled,
+                redisUsername != null && !redisUsername.isBlank());
         return (builder) -> {
             Map<String, RedisCacheConfiguration> configurationMap = new HashMap<>();
             cacheNamesWithTTLMap.forEach((cacheName, ttl) -> {
@@ -45,6 +64,54 @@ public class RedisCacheConfig {
                 configurationMap.put(cacheName, defaultConfiguration);
             });
             builder.withInitialCacheConfigurations(configurationMap);
+        };
+    }
+
+    @Bean
+    public CacheErrorHandler cacheErrorHandler() {
+        return new CacheErrorHandler() {
+            @Override
+            public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {
+                log.error("Redis cache GET failed. cache: {}, key: {}, host: {}, port: {}, ssl: {}",
+                        cache != null ? cache.getName() : "unknown",
+                        key,
+                        redisHost,
+                        redisPort,
+                        redisSslEnabled,
+                        exception);
+            }
+
+            @Override
+            public void handleCachePutError(RuntimeException exception, Cache cache, Object key, Object value) {
+                log.error("Redis cache PUT failed. cache: {}, key: {}, host: {}, port: {}, ssl: {}",
+                        cache != null ? cache.getName() : "unknown",
+                        key,
+                        redisHost,
+                        redisPort,
+                        redisSslEnabled,
+                        exception);
+            }
+
+            @Override
+            public void handleCacheEvictError(RuntimeException exception, Cache cache, Object key) {
+                log.error("Redis cache EVICT failed. cache: {}, key: {}, host: {}, port: {}, ssl: {}",
+                        cache != null ? cache.getName() : "unknown",
+                        key,
+                        redisHost,
+                        redisPort,
+                        redisSslEnabled,
+                        exception);
+            }
+
+            @Override
+            public void handleCacheClearError(RuntimeException exception, Cache cache) {
+                log.error("Redis cache CLEAR failed. cache: {}, host: {}, port: {}, ssl: {}",
+                        cache != null ? cache.getName() : "unknown",
+                        redisHost,
+                        redisPort,
+                        redisSslEnabled,
+                        exception);
+            }
         };
     }
 }

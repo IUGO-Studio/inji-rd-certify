@@ -225,6 +225,8 @@ public class DIDDocumentUtil {
 
     @Cacheable(value = "certificatedatacache", key = "#appId + '-' + #refId")
     public CertificateResponseDTO getCertificateDataResponseDto(String appId, String refId) {
+        // If this log appears, it indicates cache MISS (or cache unavailable and bypassed by handler).
+        log.info("Fetching certificate data from keymanager for appId: {} and refId: {}", appId, refId);
         AllCertificatesDataResponseDto kidResponse = keymanagerService.getAllCertificates(appId, Optional.of(refId));
         if (kidResponse == null || kidResponse.getAllCertificates() == null || kidResponse.getAllCertificates().length == 0) {
             log.error("No certificates found for appId: {} and refId: {}", appId, refId);
