@@ -165,3 +165,7 @@ We welcome contributions from everyone\!
 
 * [Check here](https://docs.inji.io/readme/contribution/code-contribution) to learn how you can contribute code to this application.
 * If you have any questions or run into issues while trying out the application, feel free to post them in the [MOSIP Community](https://community.mosip.io/) — we’ll be happy to help you out.
+
+## How to use semantic versioning in commit messages to deploy
+
+* feat(github-actions): added support for semantic versioning depending on commit type message
