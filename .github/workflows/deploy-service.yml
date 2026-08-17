@@ -8,6 +8,7 @@ on:
       - 'certify-service/**'
       - 'certify-core/**'
       - 'pom.xml'
+      - '.github/workflows/deploy-service.yml'
 
 jobs:
   deploy:
@@ -16,7 +17,7 @@ jobs:
       contents: write
       id-token: write
     environment: 
-      name: ${{ github.ref_name == 'main' && 'prod' || (github.ref_name == 'test' && 'qa' || 'develop') }}
+      name: develop
 
     steps:
       - name: Checkout code
