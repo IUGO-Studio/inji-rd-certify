@@ -13,4 +13,5 @@ databases:
         key: postgres-password
     dml: 1
     repoUrl: https://github.com/mosip/inji-certify.git
-    branch: v0.13.1
+    branch: develop
+
