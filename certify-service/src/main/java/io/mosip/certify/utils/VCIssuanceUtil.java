@@ -4,6 +4,7 @@ import foundation.identity.jsonld.JsonLDObject;
 import io.mosip.certify.core.constants.Constants;
 import io.mosip.certify.core.constants.ErrorConstants;
 import io.mosip.certify.core.constants.VCFormats;
+import io.mosip.certify.core.constants.VCIErrorConstants;
 import io.mosip.certify.core.dto.*;
 import io.mosip.certify.core.exception.CertifyException;
 import io.mosip.certify.core.exception.InvalidRequestException;
@@ -180,7 +181,7 @@ public class VCIssuanceUtil {
             String accessTokenHash = parsedAccessToken.getAccessTokenHash();
             log.error("Client Nonce not found / expired in the access token, generate new cNonce for accessTokenHash: {}",
                     accessTokenHash != null ? accessTokenHash.substring(0, Math.min(accessTokenHash.length(), 10)) + "..." : "null");
-            VCIssuanceTransaction newTransaction = createVCITransaction(securityHelperService, configuredCNonceExpireSeconds, vciCacheService, accessTokenHash);
+            VCIssuanceTransaction newTransaction = createOrUpdateVCITransaction(securityHelperService, configuredCNonceExpireSeconds, vciCacheService, accessTokenHash, transaction);
             throw new InvalidNonceException(newTransaction.getCNonce(), newTransaction.getCNonceExpireSeconds());
         }
         return cNonce;
@@ -195,9 +196,9 @@ public class VCIssuanceUtil {
         return 0;
     }
 
-    public static VCIssuanceTransaction createVCITransaction(SecurityHelperService securityHelperService, int cNonceExpireSecondsConfig,
-                                                             VCICacheService vciCacheService, String accessTokenHash) {
-        VCIssuanceTransaction transaction = new VCIssuanceTransaction();
+    public static VCIssuanceTransaction createOrUpdateVCITransaction(SecurityHelperService securityHelperService, int cNonceExpireSecondsConfig,
+                                                                     VCICacheService vciCacheService, String accessTokenHash, VCIssuanceTransaction existingTransaction) {
+        VCIssuanceTransaction transaction = (existingTransaction != null) ? existingTransaction : new VCIssuanceTransaction();
         transaction.setCNonce(securityHelperService.generateSecureRandomString(20));
         transaction.setCNonceIssuedEpoch(LocalDateTime.now(ZoneOffset.UTC).toEpochSecond(ZoneOffset.UTC));
         transaction.setCNonceExpireSeconds(cNonceExpireSecondsConfig);
@@ -221,50 +222,100 @@ public class VCIssuanceUtil {
                 return stringResponse;
 
             default:
-                throw new CertifyException(ErrorConstants.UNSUPPORTED_VC_FORMAT, " Input format " + format);
+                throw new CertifyException(VCIErrorConstants.UNSUPPORTED_CREDENTIAL_FORMAT, " Input format " + format);
         }
     }
 
-    public static Optional<CredentialMetadata> getScopeCredentialMapping(String scope, String format, CredentialIssuerMetadataDTO credentialIssuerMetadataDTO, CredentialRequest credentialRequest) {
-        Map<String, CredentialConfigurationSupportedDTO> supportedCredentials = credentialIssuerMetadataDTO.getCredentialConfigurationSupportedDTO();
-        Optional<Map.Entry<String, CredentialConfigurationSupportedDTO>> result = supportedCredentials.entrySet().stream()
-                .filter(cm -> cm.getValue().getScope().equals(scope) && cm.getValue().getFormat().equals(format))
-                .filter(cm -> {
-                    CredentialConfigurationSupportedDTO dto = cm.getValue();
-                    switch (format) {
-                        case VCFormats.LDP_VC:
-                            return new HashSet<>(dto.getCredentialDefinition().getContext()).containsAll(credentialRequest.getCredential_definition().getContext()) &&
-                                    new HashSet<>(dto.getCredentialDefinition().getType()).containsAll(credentialRequest.getCredential_definition().getType());
-                        case VCFormats.MSO_MDOC:
-                            return Objects.equals(dto.getDocType(), credentialRequest.getDoctype());
-                        case VCFormats.VC_SD_JWT:
-                            return Objects.equals(dto.getVct(), credentialRequest.getVct());
-                        default:
-                            return false;
-                    }
-                })
-                .findFirst();
+    public static Optional<CredentialMetadata> getScopeCredentialMapping(
+            String scope, String format,
+            CredentialIssuerMetadataDTO credentialIssuerMetadataDTO,
+            CredentialRequest credentialRequest) {
 
-        if(result.isPresent()) {
-            CredentialConfigurationSupportedDTO metadata = result.get().getValue();
-            CredentialMetadata credentialMetadata = new CredentialMetadata();
-            credentialMetadata.setFormat(metadata.getFormat());
-            credentialMetadata.setScope(metadata.getScope());
-            credentialMetadata.setId(result.get().getKey());
-            Map<String, Object> proofTypesSupported =  result.get().getValue().getProofTypesSupported();
-            credentialMetadata.setProofTypesSupported(proofTypesSupported);
-            if(format.equals(VCFormats.LDP_VC)){
-                credentialMetadata.setTypes(metadata.getCredentialDefinition().getType());
-            }
-            return Optional.of(credentialMetadata);
+        Map<String, CredentialConfigurationSupportedDTO> supportedCredentials =
+                credentialIssuerMetadataDTO.getCredentialConfigurationSupportedDTO();
+
+        // Filter entries by scope
+        List<Map.Entry<String, CredentialConfigurationSupportedDTO>> scopeEntries = supportedCredentials.entrySet().stream()
+                .filter(cm -> Objects.equals(scope, cm.getValue().getScope()))
+                .toList();
+
+        if (scopeEntries.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        // Check all scope-matched entries for format and validation
+        for (Map.Entry<String, CredentialConfigurationSupportedDTO> entry : scopeEntries) {
+            CredentialConfigurationSupportedDTO dto = entry.getValue();
+            if (Objects.equals(dto.getFormat(), format)) {
+                switch (format) {
+                    case VCFormats.LDP_VC:
+                        if(!isValidLdpVCRequest(credentialRequest, dto)) continue;
+                        break;
+                    case VCFormats.MSO_MDOC:
+                        if(!isValidMsoMdocRequest(credentialRequest, dto)) continue;
+                        break;
+                    case VCFormats.VC_SD_JWT:
+                        if(!isValidSDJwtRequest(credentialRequest, dto)) continue;
+                        break;
+                    default:
+                        continue;
+                }
+                // If valid, build and return metadata
+                CredentialMetadata credentialMetadata = new CredentialMetadata();
+                credentialMetadata.setFormat(dto.getFormat());
+                credentialMetadata.setScope(dto.getScope());
+                credentialMetadata.setId(entry.getKey());
+                credentialMetadata.setProofTypesSupported(dto.getProofTypesSupported());
+                if (format.equals(VCFormats.LDP_VC)) {
+                    credentialMetadata.setTypes(dto.getCredentialDefinition().getType());
+                }
+                return Optional.of(credentialMetadata);
+            }
+        }
+
+        // If no valid entry found for the format, throw format-specific exception
+        switch (format) {
+            case VCFormats.LDP_VC:
+                throw new CertifyException(VCIErrorConstants.INVALID_CREDENTIAL_REQUEST,
+                        "No matching ldp_vc credential configuration found for scope: " + scope);
+            case VCFormats.MSO_MDOC:
+                throw new CertifyException(VCIErrorConstants.INVALID_CREDENTIAL_REQUEST,
+                        "No matching mso_mdoc credential configuration found for scope: " + scope);
+            case VCFormats.VC_SD_JWT:
+                throw new CertifyException(VCIErrorConstants.INVALID_CREDENTIAL_REQUEST,
+                        "No matching vc+sd_jwt credential configuration found for scope: " + scope);
+            default:
+                throw new CertifyException(VCIErrorConstants.UNSUPPORTED_CREDENTIAL_FORMAT,
+                        "No matching credential configuration found for format: " + format);
+        }
+    }
+
+
+    private static boolean isValidLdpVCRequest(CredentialRequest credentialRequest, CredentialConfigurationSupportedDTO credentialConfigurationSupportedDTO) {
+        if(credentialRequest.getCredential_definition().getContext().size() != credentialConfigurationSupportedDTO.getCredentialDefinition().getContext().size()) {
+            return false;
+        }
+
+        if(credentialRequest.getCredential_definition().getType().size() != credentialConfigurationSupportedDTO.getCredentialDefinition().getType().size()) {
+            return false;
+        }
+
+        return new HashSet<>(credentialConfigurationSupportedDTO.getCredentialDefinition().getContext()).containsAll(credentialRequest.getCredential_definition().getContext()) &&
+                new HashSet<>(credentialConfigurationSupportedDTO.getCredentialDefinition().getType()).containsAll(credentialRequest.getCredential_definition().getType());
+    }
+
+    private static boolean isValidSDJwtRequest(CredentialRequest credentialRequest, CredentialConfigurationSupportedDTO credentialConfigurationSupportedDTO) {
+        return Objects.equals(credentialConfigurationSupportedDTO.getVct(), credentialRequest.getVct());
+    }
+
+    private static boolean isValidMsoMdocRequest(CredentialRequest credentialRequest, CredentialConfigurationSupportedDTO credentialConfigurationSupportedDTO) {
+        return Objects.equals(credentialConfigurationSupportedDTO.getDocType(), credentialRequest.getDoctype());
     }
 
     public static void validateLdpVcFormatRequest(CredentialRequest credentialRequest,
                                                   CredentialMetadata credentialMetadata) {
         if(!credentialRequest.getCredential_definition().getType().containsAll(credentialMetadata.getTypes()))
-            throw new InvalidRequestException(ErrorConstants.UNSUPPORTED_VC_TYPE);
+            throw new InvalidRequestException(VCIErrorConstants.UNSUPPORTED_CREDENTIAL_TYPE);
 
         //TODO need to validate Credential_definition as JsonLD document, if invalid throw exception
     }

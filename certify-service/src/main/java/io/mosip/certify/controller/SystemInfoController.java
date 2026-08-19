@@ -7,6 +7,7 @@ package io.mosip.certify.controller;
 
 import io.mosip.certify.api.spi.AuditPlugin;
 import io.mosip.certify.core.constants.ErrorConstants;
+import io.mosip.certify.core.constants.VCIErrorConstants;
 import io.mosip.certify.core.dto.ResponseWrapper;
 import io.mosip.certify.core.exception.CertifyException;
 import io.mosip.certify.core.util.CommonUtil;
@@ -22,6 +23,7 @@ import io.mosip.kernel.partnercertservice.service.spi.PartnerCertificateManagerS
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -48,9 +50,9 @@ public class SystemInfoController {
     @Value("${mosip.certify.audit.claim-name:preferred_username}")
     private String claimName;
 
-    @GetMapping(value = "/certificate")
+    @GetMapping(value = "/certificate", produces = "application/json")
     public ResponseWrapper<KeyPairGenerateResponseDto> getCertificate(
-            @Valid @NotBlank(message = ErrorConstants.INVALID_REQUEST) @RequestParam("applicationId") String applicationId,
+            @Valid @NotBlank(message = VCIErrorConstants.INVALID_REQUEST) @RequestParam("applicationId") String applicationId,
             @RequestParam("referenceId") Optional<String> referenceId) {
         ResponseWrapper<KeyPairGenerateResponseDto> responseWrapper = new ResponseWrapper<>();
         try {
@@ -62,7 +64,7 @@ public class SystemInfoController {
         return responseWrapper;
     }
 
-    @PostMapping(value = "/uploadCertificate")
+    @PostMapping(value = "/uploadCertificate", produces = "application/json")
     public ResponseWrapper<UploadCertificateResponseDto> uploadSignedCertificate(
             @Valid @RequestBody RequestWrapper<UploadCertificateRequestDto> requestWrapper) {
         ResponseWrapper<UploadCertificateResponseDto> responseWrapper = new ResponseWrapper<>();
@@ -76,7 +78,7 @@ public class SystemInfoController {
         return responseWrapper;
     }
 
-    @PostMapping("/generate-csr")
+    @PostMapping(value = "/generate-csr", produces = "application/json")
     public ResponseWrapper<KeyPairGenerateResponseDto> generateCSR(
             @Valid @RequestBody RequestWrapper<CSRGenerateRequestDto> requestWrapper) {
 
@@ -94,7 +96,7 @@ public class SystemInfoController {
         return responseWrapper;
     }
 
-    @PostMapping("/upload-ca-certificate")
+    @PostMapping(value = "/upload-ca-certificate", produces = "application/json")
     public ResponseWrapper<CACertificateResponseDto> uploadCACertificate(
             @Valid @RequestBody RequestWrapper<CACertificateRequestDto> requestWrapper) {
 

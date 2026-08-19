@@ -124,6 +124,8 @@ CREATE TABLE IF NOT EXISTS certify.credential_config (
     mso_mdoc_claims JSONB,
     plugin_configurations JSONB,
     credential_status_purpose TEXT[],
+    qr_settings JSONB,
+    qr_signature_algo TEXT,
     cr_dtimes TIMESTAMP NOT NULL,
     upd_dtimes TIMESTAMP,
     CONSTRAINT pk_config_id PRIMARY KEY (config_id)
@@ -168,6 +170,8 @@ INSERT INTO certify.credential_config (
     mso_mdoc_claims,
     plugin_configurations,
     credential_status_purpose,
+    qr_settings,
+    qr_signature_algo,
     cr_dtimes,
     upd_dtimes
 )
@@ -181,7 +185,7 @@ VALUES (
     'https://www.w3.org/2018/credentials/v1',  -- context as comma-separated string
     'FarmerCredential,VerifiableCredential',  -- credential_type as comma-separated string
     'ldp_vc',  -- credential_format
-    'did:web:mosip.github.io:inji-config:vc-local-ed25519',  -- did_url
+    'did:web:8398-2405-201-1029-3025-e142-9ad3-e1f2-f543.ngrok-free.app',  -- did_url
     'CERTIFY_VC_SIGN_ED25519',  -- key_manager_app_id
     'ED25519_SIGN',  -- key_manager_ref_id (optional)
     'EdDSA',  -- signature_algo (optional)
@@ -197,6 +201,8 @@ VALUES (
     NULL,  -- claims (optional)
     '[{"mosip.certify.mock.data-provider.csv.identifier-column": "id", "mosip.certify.mock.data-provider.csv.data-columns": "id,fullName,mobileNumber,dateOfBirth,gender,state,district,villageOrTown,postalCode,landArea,landOwnershipType,primaryCropType,secondaryCropType,face,farmerID", "mosip.certify.mock.data-provider.csv-registry-uri": "/home/mosip/config/farmer_identity_data.csv"}]'::JSONB,  -- plugin_configurations
     ARRAY['revocation'],  -- credential_status_purpose
+    '[{"Full Name": "${fullName}", "Phone Number": "${mobileNumber}","Date Of Birth": "${dateOfBirth}"}]'::JSONB,  -- qr_settings (optional)
+    'EdDSA',  -- qr_signature_algo (optional)
     NOW(),  -- cr_dtimes
     NULL  -- upd_dtimes (optional)
 );
@@ -308,3 +314,34 @@ CREATE TABLE IF NOT EXISTS certify.shedlock (
   locked_by VARCHAR(255) NOT NULL,
   PRIMARY KEY (name)
 );
+
+-- This script creates the iar_session table for Interactive Authorization Request functionality
+
+CREATE TABLE IF NOT EXISTS certify.iar_session (
+                                                   id SERIAL PRIMARY KEY,
+                                                   auth_session VARCHAR(128) NOT NULL UNIQUE,
+    transaction_id VARCHAR(64) NOT NULL,
+    request_id VARCHAR(64),
+    verify_nonce VARCHAR(64),
+    expires_at TIMESTAMP NOT NULL,
+    client_id VARCHAR(128),
+    scope VARCHAR(128),
+    authorization_code VARCHAR(128) UNIQUE,
+    response_uri VARCHAR(512),
+    code_challenge VARCHAR(128),
+    code_challenge_method VARCHAR(10),
+    code_issued_at TIMESTAMP,
+    is_code_used BOOLEAN NOT NULL DEFAULT FALSE,
+    code_used_at TIMESTAMP,
+    cr_dtimes TIMESTAMP NOT NULL DEFAULT NOW(),
+    identity_data TEXT
+    );
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_iar_session_auth_session ON certify.iar_session(auth_session);
+CREATE INDEX IF NOT EXISTS idx_iar_session_authorization_code ON certify.iar_session(authorization_code);
+CREATE INDEX IF NOT EXISTS idx_iar_session_request_id ON certify.iar_session(request_id);
+CREATE INDEX IF NOT EXISTS idx_iar_session_expires_at ON certify.iar_session(expires_at);
+CREATE INDEX IF NOT EXISTS idx_iar_session_authorization_code_used ON certify.iar_session(authorization_code, is_code_used) WHERE authorization_code IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_iar_session_scope ON certify.iar_session(scope);
+CREATE INDEX IF NOT EXISTS idx_iar_session_transaction_id ON certify.iar_session(transaction_id);
