@@ -27,20 +27,21 @@ Inji Certify enables issuers to generate, sign and issue a verifiable credential
 
 In particular, certify focuses on the issuer’s role in and provides the following features from OpenID4VC (draft 13):
 
-| Feature                                                                 | Coverage |
-|:------------------------------------------------------------------------|:---------|
-| Issuer Metadata                                                         | ✅        |
-| Support for access token validation                                     | ✅        |
-| Credential Issuance                                                     | ✅        |
-| Credential Binding with did:.. keys                                     | ✅        |
-| Credential Binding with jwt proof                                       | ✅        |
-| Support for JSON\_LD VC Format                                          | ✅        |
-| Support for IETF SD\_JWT VC Format with support only for vc+sd\_jwt     | ✅        |
-| Revocation support for JSON\_LD                                         | ✅        |
-| Support for mDoc/mDL VC Format                                          | ❌        |
-| Credential Offer with Pre Authorisation Code Flow                       | ❌        |
-| Credential Offer with Authorisation Code Flow                           | ❌        |
-| Credential Binding with cwt proof                                       | ❌        |
+| Feature                                                             | Coverage |
+|:--------------------------------------------------------------------|:---------|
+| Issuer Metadata                                                     | ✅        |
+| Support for access token validation                                 | ✅        |
+| Credential Issuance                                                 | ✅        |
+| Credential Binding with did:.. keys                                 | ✅        |
+| Credential Binding with jwt proof                                   | ✅        |
+| Support for JSON\_LD VC Format                                      | ✅        |
+| Support for IETF SD\_JWT VC Format with support only for vc+sd\_jwt | ✅        |
+| Revocation support for JSON\_LD                                     | ✅        |
+| Credential Offer with Pre Authorization Code Flow                   | ✅        |
+| Credential Issuance with Interactive Authorization Request          | ✅        |
+| Support for mDoc/mDL VC Format                                      | ❌        |
+| Credential Offer with Authorization Code Flow(redirect-to-web)      | ❌        |
+| Credential Binding with cwt proof                                   | ❌        |
 
 To know more about features available in certify please refer to [this documentation](https://docs.inji.io/inji-certify/overview/features).
 
@@ -65,9 +66,9 @@ Inji Certify provides a **plugin-based architecture** that enables modular, exte
 ### How to Use Plugins
 
 * **[Overview: Choosing the Right Plugin](./docs/VCIssuance-vs-DataProvider.md)** – Learn the differences between the two plugin types and how to decide which suits your issuer requirements.
-* **[Postgres Data Provider Plugin](https://github.com/mosip/digital-credential-plugins/tree/master/postgres-dataprovider-plugin)** – Example walkthrough using the **Land Registry use case**. The same steps can be adapted for other use cases.
-* **[Mock CSV Data Provider Plugin](https://github.com/mosip/digital-credential-plugins/tree/master/mock-certify-plugin#mockcsvdataproviderplugin)** – Guide for trying out the CSV-based plugin.
-* **[VC Issuance Plugin](https://github.com/mosip/digital-credential-plugins/tree/master/mock-certify-plugin#mockvcissuanceplugin)** - Guide for trying VC issuance plugin.
+* **[Postgres Data Provider Plugin](https://github.com/inji/digital-credential-plugins/tree/master/postgres-dataprovider-plugin)** – Example walkthrough using the **Land Registry use case**. The same steps can be adapted for other use cases.
+* **[Mock CSV Data Provider Plugin](https://github.com/inji/digital-credential-plugins/tree/master/mock-certify-plugin#mockcsvdataproviderplugin)** – Guide for trying out the CSV-based plugin.
+* **[VC Issuance Plugin](https://github.com/inji/digital-credential-plugins/tree/master/mock-certify-plugin#mockvcissuanceplugin)** - Guide for trying VC issuance plugin.
 
 ### Advanced: Creating Custom Plugins
 
@@ -79,8 +80,8 @@ public interface DataProviderPlugin {
 }
 ```
 
-* **Reference Implementation:** [Postgres Data Provider Plugin](https://github.com/mosip/digital-credential-plugins/tree/master/postgres-dataprovider-plugin)
-* Once a custom plugin has been developed refer to this [document](https://github.com/mosip/inji-certify/blob/master/docs/Custom-Plugin-K8s.md) to deploy the plugin.
+* **Reference Implementation:** [Postgres Data Provider Plugin](https://github.com/inji/digital-credential-plugins/tree/master/postgres-dataprovider-plugin)
+* Once a custom plugin has been developed refer to this [document](https://github.com/inji/inji-certify/blob/master/docs/Custom-Plugin-K8s.md) to deploy the plugin.
 
 ## Deployment
 
@@ -103,7 +104,7 @@ Inji Certify supporting two mode of deployment to cater different users with dif
     * Enables issuers to host and utilize the product at scale.
     * Click [here](https://docs.inji.io/readme/setup/deploy#deploying-inji-certify) to learn more about this mode of deployment.
 
-If you are creating your own custom plugin, you can refer to [this link](https://github.com/mosip/inji-certify/blob/master/docs/Custom-Plugin-K8s.md) to know steps to deploy custom plugins using kubernetes.
+If you are creating your own custom plugin, you can refer to [this link](https://github.com/inji/inji-certify/blob/master/docs/Custom-Plugin-K8s.md) to know steps to deploy custom plugins using kubernetes.
 
 ## Configurations
 
@@ -128,7 +129,7 @@ To know more about this configuration please refer to [this link](https://docs.i
 
 ### Enable VC Issuance with mock mDoc/mDL format
 
-To enable certify to issue VC with mDoc/mDL (mock is supported currently) few properties needed to be updated. Refer [here](https://github.com/mosip/digital-credential-plugins/tree/master/mock-certify-plugin#mdocmockvcissuanceplugin) to know about the properties.
+To enable certify to issue VC with mDoc/mDL (mock is supported currently) few properties needed to be updated. Refer [here](https://github.com/inji/digital-credential-plugins/tree/master/mock-certify-plugin#mdocmockvcissuanceplugin) to know about the properties.
 
 ## Databases
 

@@ -34,10 +34,10 @@ ENV spring_config_label_env=${spring_config_label}
 ENV spring_config_url_env=${spring_config_url}
 
 # can be passed during Docker build as build time environment for github branch to pickup configuration from.
-ARG container_user=mosip
+ARG container_user=inji
 
 # can be passed during Docker build as build time environment for github branch to pickup configuration from.
-ARG container_user_group=mosip
+ARG container_user_group=inji
 
 # can be passed during Docker build as build time environment for github branch to pickup configuration from.
 ARG container_user_uid=1001
@@ -78,6 +78,9 @@ RUN chmod +x configure_start.sh
 RUN chmod a-w /home/${container_user}/configure_start.sh
 
 COPY ./target/certify-service-*.jar certify-service.jar
+
+# IUGO REST data-provider plugin (CuentaDigital identity fetch)
+COPY ./loader_path/certify/*.jar ${loader_path}
 
 # change permissions of file inside working dir
 RUN chown -R ${container_user}:${container_user} /home/${container_user}

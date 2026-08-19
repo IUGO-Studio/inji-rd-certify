@@ -44,6 +44,7 @@ public class VCIssuanceController {
      */
     @PostMapping(value = "/credential",produces = "application/json")
     public CredentialResponse getCredential(@Valid @RequestBody CredentialRequest credentialRequest) throws CertifyException {
+        log.info("Get credential request received for format: {}", credentialRequest.getFormat());
         return vcIssuanceService.getCredential(credentialRequest);
     }
 
@@ -85,7 +86,7 @@ public class VCIssuanceController {
     }
 
     @Deprecated
-    @GetMapping(value = "/.well-known/did.json")
+    @GetMapping(value = "/.well-known/did.json", produces = "application/json")
     public Map<String, Object> getDIDDocument() {
        return vcIssuanceService.getDIDDocument();
     }

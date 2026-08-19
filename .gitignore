@@ -9,6 +9,7 @@
 
 # Package Files #
 *.jar
+!certify-service/loader_path/certify/restapi-dataprovider-plugin-*.jar
 *.war
 *.nar
 *.ear
