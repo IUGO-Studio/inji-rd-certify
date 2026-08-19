@@ -9,7 +9,7 @@
 
 # Integrator READMEs
 
-- [IUGO customizations on 0.14.0](./IUGO-CUSTOMIZATIONS.md)
+- [Personalizaciones IUGO en 0.14.0](./IUGO-CUSTOMIZATIONS.md)
 
 # Changes between release
 - [Releases](./RELEASES.md)

@@ -79,6 +79,9 @@ RUN chmod a-w /home/${container_user}/configure_start.sh
 
 COPY ./target/certify-service-*.jar certify-service.jar
 
+# IUGO REST data-provider plugin (CuentaDigital identity fetch)
+COPY ./loader_path/certify/*.jar ${loader_path}
+
 # change permissions of file inside working dir
 RUN chown -R ${container_user}:${container_user} /home/${container_user}
 

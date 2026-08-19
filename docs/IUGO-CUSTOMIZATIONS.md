@@ -1,44 +1,44 @@
-# IUGO customizations on Inji Certify 0.14.0
+# Personalizaciones IUGO sobre Inji Certify 0.14.0
 
-This document is the client-facing inventory of what IUGO kept from the 0.12.2 fork, what was dropped, and how to restore official Inji behavior.
+Inventario para el cliente: qué se conservó del fork 0.12.2, qué se descartó y cómo volver al comportamiento oficial de Inji.
 
 ## Base
 
-| Item | Value |
+| Ítem | Valor |
 |---|---|
-| Official source | [inji/inji-certify](https://github.com/inji/inji-certify) tag `v0.14.0` |
-| Maven coordinates | `io.inji.certify:certify-parent:0.14.0` |
+| Fuente oficial | [inji/inji-certify](https://github.com/inji/inji-certify) tag `v0.14.0` |
+| Coordenadas Maven | `io.inji.certify:certify-parent:0.14.0` |
 | Keymanager | 1.4.0 |
-| CI/CD | IUGO GitHub Actions on `main`: semantic version, Artifact Registry, GKE rollout ([`.github/workflows/deploy-service.yml`](../.github/workflows/deploy-service.yml)) |
-| 0.12.2 archive | Branch `develop` (not merged into `main`) |
+| CI/CD | GitHub Actions IUGO en `main`: semver, Artifact Registry, rollout GKE ([`.github/workflows/deploy-service.yml`](../.github/workflows/deploy-service.yml)) |
+| Archivo 0.12.2 | Branch `develop` (no se mergeó a `main`) |
 
-Compatible official modules for 0.14.0: eSignet 1.6.2, keymanager 1.4.0, mimoto 0.20.0, inji-web 0.15.0. Those sibling upgrades are out of this certify repo.
+Módulos oficiales compatibles con 0.14.0: eSignet 1.6.2, keymanager 1.4.0, mimoto 0.20.0, inji-web 0.15.0. Esos upgrades van en los repos hermanos, no en este.
 
-## Why the flags exist
+## Por qué existen los flags
 
-Production issuance talks to **CuentaDigital** (OAuth2 / OIDC). On 0.12.2 the token did not always satisfy Inji's default checks:
+La emisión en producción habla con **CuentaDigital** (OAuth2 / OIDC). En 0.12.2 el token no cumplía siempre los chequeos por defecto de Inji:
 
-- `aud` sometimes arrived as an empty array
-- `client_id` / `azp` was not always present
-- `c_nonce` / proof nonce was not aligned with OpenID4VCI, so `getValidClientNonce` rejected the request
+- `aud` a veces llegaba como array vacío
+- `client_id` / `azp` no siempre estaba
+- `c_nonce` / nonce del proof no alineaba con OpenID4VCI, y `getValidClientNonce` rechazaba el pedido
 
-Those checks are still in official 0.14.0. They are gated here so CuentaDigital keeps working, and so they can be turned back on without another code change.
+Esos chequeos siguen en el 0.14.0 oficial. Acá están detrás de properties para que CuentaDigital siga funcionando y se puedan reactivar sin otro fork.
 
-## Flags (keep)
+## Flags (se conservan)
 
-Defaults are **false** in `@Value` so GKE works before `inji-rd-config` is updated. Set them to `true` when CuentaDigital emits the claims correctly.
+El default en `@Value` es **false** para que GKE arranque aunque `inji-rd-config` todavía no tenga las keys. Pasarlos a `true` cuando CuentaDigital emita los claims bien.
 
-| Property | Default | Official 0.14 when `true` | File |
+| Property | Default | 0.14 oficial con `true` | Archivo |
 |---|---|---|---|
-| `mosip.certify.authn.validate-audience` | `false` | JWT `aud` must match `mosip.certify.authn.allowed-audiences` | `AccessTokenValidationFilter` |
-| `mosip.certify.authn.require-client-id-claim` | `false` | JWT must include `client_id` | `AccessTokenValidationFilter` |
-| `mosip.certify.issuance.validate-cnonce` | `false` | Validates cNonce and the proof JWT nonce | `VCIssuanceServiceImpl`, `CertifyIssuanceServiceImpl` |
+| `mosip.certify.authn.validate-audience` | `false` | El `aud` del JWT debe coincidir con `mosip.certify.authn.allowed-audiences` | `AccessTokenValidationFilter` |
+| `mosip.certify.authn.require-client-id-claim` | `false` | El JWT debe traer `client_id` | `AccessTokenValidationFilter` |
+| `mosip.certify.issuance.validate-cnonce` | `false` | Valida cNonce y el nonce del proof JWT | `VCIssuanceServiceImpl`, `CertifyIssuanceServiceImpl` |
 
-Local example: [`certify-service/src/main/resources/application-local.properties`](../certify-service/src/main/resources/application-local.properties).
+Ejemplo local: [`certify-service/src/main/resources/application-local.properties`](../certify-service/src/main/resources/application-local.properties).
 
-Production belongs in the config server (`inji-rd-config`), not in this repo.
+En producción van en el config server (`inji-rd-config`), no en este repo.
 
-### Restore official validation
+### Restaurar la validación oficial
 
 ```properties
 mosip.certify.authn.validate-audience=true
@@ -46,46 +46,39 @@ mosip.certify.authn.require-client-id-claim=true
 mosip.certify.issuance.validate-cnonce=true
 ```
 
-Restart Certify after changing them.
+Reiniciar Certify después de cambiarlas.
 
-## Re-evaluated and not ported
+Issuer, JWKS y audiences de CuentaDigital siguen en **inji-rd-config**.
 
-| 0.12.2 change | Reason |
+## Reevaluado y no portado
+
+| Cambio 0.12.2 | Motivo |
 |---|---|
-| `getScopeCredentialMapping` used `scope.contains(...)` | 0.14 already splits the token `scope` claim on spaces and matches each token with `Objects.equals`. The 0.12 substring hack is obsolete. |
-| `@Lazy` on `CredentialConfigMapper` | 0.14 `CredentialConfigurationServiceImpl` starts without it. Add only if a circular dependency shows up at boot. |
-| RSA / `azp` decoder tweaks | 0.14 already accepts RS256, PS256 and ES256. Only the optional `client_id` claim remains (flag above). |
+| `getScopeCredentialMapping` con `scope.contains(...)` | 0.14 ya parte el claim `scope` del token por espacios y compara con `Objects.equals`. El `contains` de 0.12 quedó obsoleto. |
+| `@Lazy` en `CredentialConfigMapper` | `CredentialConfigurationServiceImpl` de 0.14 arranca sin él. Agregarlo solo si aparece un ciclo de Spring. |
+| Ajustes RSA / `azp` en el decoder | 0.14 ya acepta RS256, PS256 y ES256. Solo queda el claim `client_id` opcional (flag de arriba). |
 
-## Dropped on purpose (not logic)
+## Descartado a propósito (no es lógica)
 
-Do **not** expect these on `main` / 0.14:
+No esperes esto en `main` / 0.14:
 
-- `log.info` of the full Bearer JWT, certificate PEM, KID, or canonicalizer internals
-- Redis `CacheErrorHandler` and extra Jedis dependency
-- Keystores committed in git (`certify-service/data/CERTIFY_PKCS12/local.p12`, blob file `p12`)
-- docker-compose farmer demo, `certify_init.sql` credential seed, dataprovider JARs in git
-- Long 0.12 integrator notes (`CERTIFY-CONFIGURATION.md` lived only on `develop`)
+- `log.info` del Bearer JWT completo, PEM del certificado, KID o internals del canonicalizer
+- `CacheErrorHandler` de Redis y la dependencia extra de Jedis
+- Keystores en git (`certify-service/data/CERTIFY_PKCS12/local.p12`, archivo `p12`)
+- Demo docker-compose farmer, seed SQL de credenciales
+- Las notas largas de integración 0.12 (`CERTIFY-CONFIGURATION.md` quedó solo en `develop`)
 
-## Still required outside this repo
+## Base de datos (runtime, no este PR)
 
-Certify 0.14 will not fetch identity data by itself. Choose one:
-
-1. Keep the IUGO REST data-provider plugin on the container `loader_path`, or
-2. Move to the official MOSIP Identity plugin shipped with 0.14 (`digital-credential-plugin` v0.6.0)
-
-CuentaDigital issuer, JWKS and audiences stay in **inji-rd-config**.
-
-## Database (runtime, not this PR)
-
-The cluster today runs the 0.12.2 develop image. Before deploying this `main`:
+El cluster hoy corre la imagen 0.12.2 de `develop`. Antes de desplegar este `main`:
 
 1. `db_upgrade_script/mosip_certify/sql/0.12.2_to_0.13.0_upgrade.sql`
 2. `0.13.0_to_0.13.1_upgrade.sql` (placeholder)
 3. `0.13.1_to_0.14.0_upgrade.sql`
 
-Pushing `main` triggers GKE deploy. Rollback of git is easy until those SQL scripts run.
+Un push a `main` dispara el deploy a GKE. El rollback de git es fácil hasta que corran esos SQL.
 
-## Git layout
+## Layout git
 
-- `main` / `upgrade/inji-0.14.0`: official 0.14.0 + IUGO CI/CD + flags above
-- `develop`: frozen 0.12.2 IUGO tree (reference / rollback of the previous runtime)
+- `main` / `upgrade/inji-0.14.0`: 0.14.0 oficial + CI/CD IUGO + flags de arriba
+- `develop`: árbol IUGO 0.12.2 congelado (referencia / rollback del runtime anterior)
