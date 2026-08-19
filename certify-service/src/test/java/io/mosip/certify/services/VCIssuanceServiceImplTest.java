@@ -96,6 +96,7 @@ public class VCIssuanceServiceImplTest {
         testIssuerMetadataMap.put("latest", latestMetadataConfig);
 
         ReflectionTestUtils.setField(issuanceService, "cNonceExpireSeconds", 300);
+        ReflectionTestUtils.setField(issuanceService, "validateCNonce", true);
 
         when(parsedAccessToken.getAccessTokenHash()).thenReturn(TEST_ACCESS_TOKEN_HASH);
 

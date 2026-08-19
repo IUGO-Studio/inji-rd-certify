@@ -8,6 +8,7 @@ package io.mosip.certify.filter;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimNames;
@@ -53,6 +55,12 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
     @Value("#{${mosip.certify.authn.filter-urls}}")
     private List<String> urlPatterns;
 
+    @Value("${mosip.certify.authn.validate-audience:false}")
+    private boolean validateAudience;
+
+    @Value("${mosip.certify.authn.require-client-id-claim:false}")
+    private boolean requireClientIdClaim;
+
     @Autowired
     private ParsedAccessToken parsedAccessToken;
 
@@ -70,17 +78,22 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
                 algo.add(SignatureAlgorithm.RS256);
                 algo.add(SignatureAlgorithm.PS256);
             }).build();
-            nimbusJwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
-                    new JwtTimestampValidator(),
-                    new JwtIssuerValidator(issuerUri),
-                    new JwtClaimValidator<List<String>>(JwtClaimNames.AUD,
-                            aud -> aud.stream().anyMatch(allowedAudiences::contains)),
-                    new JwtClaimValidator<String>(JwtClaimNames.SUB, Objects::nonNull),
-                    new JwtClaimValidator<String>(Constants.CLIENT_ID, Objects::nonNull),
-                    new JwtClaimValidator<Instant>(JwtClaimNames.IAT,
-                            iat -> iat != null && iat.isBefore(Instant.now(Clock.systemUTC()))),
-                    new JwtClaimValidator<Instant>(JwtClaimNames.EXP,
-                            exp -> exp != null && exp.isAfter(Instant.now(Clock.systemUTC())))));
+            List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
+            validators.add(new JwtTimestampValidator());
+            validators.add(new JwtIssuerValidator(issuerUri));
+            if (validateAudience) {
+                validators.add(new JwtClaimValidator<List<String>>(JwtClaimNames.AUD,
+                        aud -> aud != null && aud.stream().anyMatch(allowedAudiences::contains)));
+            }
+            validators.add(new JwtClaimValidator<String>(JwtClaimNames.SUB, Objects::nonNull));
+            if (requireClientIdClaim) {
+                validators.add(new JwtClaimValidator<String>(Constants.CLIENT_ID, Objects::nonNull));
+            }
+            validators.add(new JwtClaimValidator<Instant>(JwtClaimNames.IAT,
+                    iat -> iat != null && iat.isBefore(Instant.now(Clock.systemUTC()))));
+            validators.add(new JwtClaimValidator<Instant>(JwtClaimNames.EXP,
+                    exp -> exp != null && exp.isAfter(Instant.now(Clock.systemUTC()))));
+            nimbusJwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(validators));
         }
         return nimbusJwtDecoder;
     }

@@ -133,6 +133,7 @@ public class CertifyIssuanceServiceImplTest {
 
 
         ReflectionTestUtils.setField(issuanceService, "cNonceExpireSeconds", 300);
+        ReflectionTestUtils.setField(issuanceService, "validateCNonce", true);
         ReflectionTestUtils.setField(issuanceService, "didUrl", "https://test.issuer.com");
         ReflectionTestUtils.setField(issuanceService, "domainUrl", "did:example:ldp");
         ReflectionTestUtils.setField(issuanceService, "ledgerUtils", ledgerUtils);
