@@ -65,7 +65,8 @@ WORKDIR /home/${container_user}
 
 ENV work_dir=/home/${container_user}
 
-ARG loader_path=${work_dir}/additional_jars/
+# Use container_user ARG directly (ENV expansion in ARG defaults is unreliable)
+ARG loader_path=/home/${container_user}/additional_jars/
 
 RUN mkdir -p ${loader_path}
 
