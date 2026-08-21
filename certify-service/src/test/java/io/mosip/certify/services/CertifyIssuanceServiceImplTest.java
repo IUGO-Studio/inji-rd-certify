@@ -401,6 +401,26 @@ public class CertifyIssuanceServiceImplTest {
     }
 
     @Test
+    public void getCredential_CuentaDigitalSpaceSeparatedScopes_PassesScopeMapping() {
+        request = createValidCredentialRequest(DEFAULT_FORMAT_LDP);
+        mockGlobalCredentialIssuerMetadataDTO.getCredentialConfigurationSupportedDTO()
+                .values()
+                .forEach(dto -> dto.setScope("openid offline_access profile email"));
+
+        Map<String, Object> cuentaDigitalClaims = new HashMap<>(claimsFromAccessToken);
+        cuentaDigitalClaims.put("scope", "openid offline_access profile email");
+
+        when(parsedAccessToken.isActive()).thenReturn(true);
+        when(parsedAccessToken.getClaims()).thenReturn(cuentaDigitalClaims);
+        when(vciCacheService.getVCITransaction(TEST_ACCESS_TOKEN_HASH)).thenReturn(transaction);
+        when(proofValidatorFactory.getProofValidator(anyString())).thenReturn(proofValidator);
+        when(proofValidator.validate(anyString(), anyString(), any(CredentialProof.class), any())).thenReturn(false);
+
+        CertifyException ex = assertThrows(CertifyException.class, () -> issuanceService.getCredential(request));
+        assertEquals(VCIErrorConstants.INVALID_PROOF, ex.getErrorCode());
+    }
+
+    @Test
     public void getCredential_InvalidProof_Fail() {
         request = createValidCredentialRequest(DEFAULT_FORMAT_LDP);
         when(parsedAccessToken.isActive()).thenReturn(true);

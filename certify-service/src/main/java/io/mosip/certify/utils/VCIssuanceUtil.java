@@ -234,9 +234,12 @@ public class VCIssuanceUtil {
         Map<String, CredentialConfigurationSupportedDTO> supportedCredentials =
                 credentialIssuerMetadataDTO.getCredentialConfigurationSupportedDTO();
 
-        // Filter entries by scope
+        // Filter entries by scope. Exact match covers eSignet-style credential scopes
+        // (mock_identity_vc_ldp). CuentaDigital stores several OIDC scopes in one
+        // credential_config.scope string; after the caller splits the token claim,
+        // a single token such as "openid" must still match that list.
         List<Map.Entry<String, CredentialConfigurationSupportedDTO>> scopeEntries = supportedCredentials.entrySet().stream()
-                .filter(cm -> Objects.equals(scope, cm.getValue().getScope()))
+                .filter(cm -> scopesMatch(scope, cm.getValue().getScope()))
                 .toList();
 
         if (scopeEntries.isEmpty()) {
@@ -290,6 +293,29 @@ public class VCIssuanceUtil {
         }
     }
 
+
+    /**
+     * True when the token scope equals the configured scope, or when the token
+     * scope is one of the space-separated values stored in credential_config.scope.
+     */
+    static boolean scopesMatch(String requestedScope, String configuredScope) {
+        if (Objects.equals(requestedScope, configuredScope)) {
+            return true;
+        }
+        if (requestedScope == null || configuredScope == null
+                || requestedScope.isBlank() || configuredScope.isBlank()) {
+            return false;
+        }
+        if (requestedScope.contains(Constants.SPACE)) {
+            return false;
+        }
+        for (String configuredToken : configuredScope.split(Constants.SPACE)) {
+            if (!configuredToken.isBlank() && configuredToken.equals(requestedScope)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private static boolean isValidLdpVCRequest(CredentialRequest credentialRequest, CredentialConfigurationSupportedDTO credentialConfigurationSupportedDTO) {
         if(credentialRequest.getCredential_definition().getContext().size() != credentialConfigurationSupportedDTO.getCredentialDefinition().getContext().size()) {

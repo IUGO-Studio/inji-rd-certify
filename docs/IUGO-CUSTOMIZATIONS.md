@@ -50,11 +50,16 @@ Reiniciar Certify después de cambiarlas.
 
 Issuer, JWKS y audiences de CuentaDigital siguen en **inji-rd-config**.
 
+## Scope OIDC de CuentaDigital (se conserva)
+
+0.14 parte el claim `scope` del token y compara con `Objects.equals` contra `credential_config.scope`. CuentaDigital emite `openid offline_access profile email` y esa misma cadena está en la config INTRANT, así que el equals nunca matcheaba.
+
+`VCIssuanceUtil.scopesMatch` mantiene el equals oficial y, además, trata el valor de config como lista: un token del JWT (`openid`) matchea esa lista. No es un `contains` de substring (el de 0.12 matcheaba `open` dentro de `openid`).
+
 ## Reevaluado y no portado
 
 | Cambio 0.12.2 | Motivo |
 |---|---|
-| `getScopeCredentialMapping` con `scope.contains(...)` | 0.14 ya parte el claim `scope` del token por espacios y compara con `Objects.equals`. El `contains` de 0.12 quedó obsoleto. |
 | `@Lazy` en `CredentialConfigMapper` | `CredentialConfigurationServiceImpl` de 0.14 arranca sin él. Agregarlo solo si aparece un ciclo de Spring. |
 | Ajustes RSA / `azp` en el decoder | 0.14 ya acepta RS256, PS256 y ES256. Solo queda el claim `client_id` opcional (flag de arriba). |
 
