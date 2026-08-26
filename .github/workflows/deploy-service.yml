@@ -1,3 +1,24 @@
+# CI/CD propio de este fork (no viene de upstream MOSIP - los demas workflows
+# en este directorio, push-trigger.yml/manual-docker-build.yml/chart-lint-publish.yml,
+# si vienen del fork y corren via los reusable workflows de mosip/kattu, sin
+# relacion con este ni con el cluster del proyecto).
+#
+# En cada push a `main` que toque certify-service/, certify-core/, pom.xml o
+# este mismo archivo: build con Maven, arma la imagen Docker y la pushea a
+# Artifact Registry (us-central1-docker.pkg.dev/<GCP_PROJECT_ID>/<GAR_REPOSITORY>,
+# variables de repo/organizacion) con 4 tags (latest, sha, version semantica,
+# tag semantico), y termina haciendo `kubectl rollout restart` DIRECTO contra
+# el cluster k8s-inji-dev - namespace inji-certify, deployment inji-certify.
+#
+# Importante: este ultimo paso no pasa por inji-rd/inji-stack/deploy/ (Helm) -
+# solo reinicia el Deployment que ya esta en el cluster con lo que sea que
+# `helm upgrade` haya dejado ahi la ultima vez. Un push a main en cualquier
+# momento reinicia el pod en produccion/dev sin coordinacion con quien este
+# operando el cluster desde el lado de infra (inji-rd) - si estas debuggeando
+# algo en vivo, un push aca te puede pisar el estado a mitad de camino.
+#
+# Autenticacion: `GCP_SA_KEY` (key de Service Account estatica, secret de este
+# repo) - no usa Workload Identity Federation como el workflow de inji-rd.
 name: Deploy Certify Service
 
 on:
