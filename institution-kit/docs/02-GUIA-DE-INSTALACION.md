@@ -316,9 +316,11 @@ Hasta que OGTIC confirme el registro, un ciudadano aún no podrá emitir la cred
 |--------|-----------|
 | Error porque falta un valor en `.env`, o el secret sigue siendo `REEMPLAZAR_CON_SECRET_DE_OGTIC` | Abra `.env`, complete o corrija el valor, guarde y vuelva a ejecutar `./install.sh` |
 | El health no responde o hay timeout | Espere unos minutos (el primer arranque es lento). Luego revise logs: `docker compose logs certify` |
+| Health responde JSON con `Full authentication is required` | Regenere config y reinicie Certify (`./scripts/generate-properties.sh` y `docker compose up -d --force-recreate certify`). Debe devolver `{"status":"UP"}` |
 | Modo dominio: no obtiene el certificado HTTPS | Confirme con infraestructura que el DNS sigue apuntando al servidor y que el puerto 80 está abierto |
 | Modo IP: la URL no responde desde internet | Confirme que el puerto 443 de la IP pública llega al servidor |
 | Mensaje de que no encuentra el complemento RestAPI (archivo `.jar`) | Verifique que clonó el repositorio completo (`inji-rd-certify`) y que existe la carpeta `certify-service/loader_path/certify/` con ese archivo |
+| `docker compose ... no configuration file provided` | Ejecute los comandos desde la carpeta `institution-kit/` (donde está `docker-compose.yml`) |
 
 ### Acceso a logs por servicio
 

@@ -32,14 +32,16 @@ mosip.certify.security.auth.post-urls={}
 mosip.certify.security.auth.put-urls={}
 mosip.certify.security.auth.get-urls={}
 
-mosip.certify.security.ignore-csrf-urls=**/actuator/**,/favicon.ico,**/error,\
-  **/swagger-ui/**,**/v3/api-docs/**,\
-  **/issuance/**,**/credential-configurations/**,**/.well-known/**,**/ledger-search/**,**/credentials/**,\
-  **/oauth/**,**/pre-authorized-data/**,**/credential-offer-data/**
+# Paths are relative to server.servlet.path (/v1/certify). Use leading "/" so
+# Spring Security 6 MvcRequestMatcher matches (**/actuator/** does not).
+mosip.certify.security.ignore-csrf-urls=/actuator/**,/favicon.ico,/error,\
+  /swagger-ui/**,/v3/api-docs/**,\
+  /issuance/**,/credential-configurations/**,/.well-known/**,/ledger-search/**,/credentials/**,\
+  /oauth/**,/pre-authorized-data/**,/credential-offer-data/**
 
-mosip.certify.security.ignore-auth-urls=**/actuator/**,**/error,**/swagger-ui/**,\
-  **/v3/api-docs/**, **/issuance/**,**/rendering-template/**, **/system-info/**,**/credential-configurations/**,\
-  **/.well-known/**,**/ledger-search/**,**/credentials/**,**/oauth/**,**/pre-authorized-data/**,**/credential-offer-data/**
+mosip.certify.security.ignore-auth-urls=/actuator/**,/error,/swagger-ui/**,\
+  /v3/api-docs/**,/issuance/**,/rendering-template/**,/system-info/**,/credential-configurations/**,\
+  /.well-known/**,/ledger-search/**,/credentials/**,/oauth/**,/pre-authorized-data/**,/credential-offer-data/**
 
 mosip.certify.security.cors-enabled-get-method-urls=/rendering-template/**
 
