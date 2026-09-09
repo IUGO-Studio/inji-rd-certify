@@ -55,9 +55,9 @@ Caddy obtiene y renueva automáticamente el certificado HTTPS con Let's Encrypt 
 
 Usar cuando la institución no provee un nombre de dominio propio.
 
-- Indicar en el `.env` la IP pública del servidor (`SERVER_PUBLIC_IP`) y el proveedor DNS dinámico (por defecto `sslip.io`; también puede usarse `nip.io`)
+- Indicar en el `.env` la IP pública del servidor (`SERVER_PUBLIC_IP`), el proveedor DNS dinámico (por defecto `sslip.io`; también puede usarse `nip.io`) y `CADDY_ACME_EMAIL`
 - El kit deriva un hostname usable, por ejemplo: `https://203-0-113-10.sslip.io`
-- Caddy genera un certificado autofirmado (`tls internal`)
+- Caddy solicita un certificado HTTPS a Let's Encrypt (ACME HTTP-01), igual que en modo dominio. Requiere puerto 80 abierto desde internet.
 
 ### Puertos de red (entrada y salida)
 
@@ -65,13 +65,13 @@ El equipo de infraestructura debe asegurar que los siguientes puertos estén dis
 
 | Puerto | Dirección | Destino | Razón |
 |--------|-----------|---------|-------|
-| 80/tcp | in | Internet → servidor (Caddy) | Validación ACME HTTP-01 (Let's Encrypt) y renovación automática del certificado. Obligatorio en modo dominio (`TLS_MODE=domain`). No requerido en modo IP. |
+| 80/tcp | in | Internet → servidor (Caddy) | Validación ACME HTTP-01 (Let's Encrypt) y renovación automática del certificado. Obligatorio en ambos modos (`domain` e `ip`). |
 | 443/tcp | in | Internet → servidor (Caddy) | HTTPS público del emisor (OID4VCI, health, DID). Obligatorio en ambos modos. |
 | 443/tcp | out | `cuenta.digital.gob.do` | OAuth / validación de tokens JWT (Cuenta Única / Cuenta Digital). |
 | 443/tcp | out | URL de la API de datos de la institución | Obtener los datos del ciudadano para armar la credencial. |
 | 443/tcp | out | Registries Docker / Maven | Descarga de imágenes y dependencias en el build (primera instalación). |
 
-**Nota:** el puerto interno de Certify (8090) no se publica en internet. Caddy recibe el tráfico HTTPS en el 443, lo desencripta y lo reenvía a Certify por la red interna de Docker. En modo dominio, el puerto 80 debe estar abierto desde internet para que Caddy pueda obtener y renovar el certificado con Let’s Encrypt.
+**Nota:** el puerto interno de Certify (8090) no se publica en internet. Caddy recibe el tráfico HTTPS en el 443, lo desencripta y lo reenvía a Certify por la red interna de Docker. El puerto 80 debe estar abierto desde internet para que Caddy pueda obtener y renovar el certificado con Let’s Encrypt.
 
 ---
 

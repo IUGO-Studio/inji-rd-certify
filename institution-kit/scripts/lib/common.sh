@@ -123,7 +123,7 @@ validate_env() {
       missing+=("$var")
     fi
   done
-  if [[ "${TLS_MODE}" == "domain" && -z "${CADDY_ACME_EMAIL:-}" ]]; then
+  if [[ -z "${CADDY_ACME_EMAIL:-}" ]]; then
     missing+=("CADDY_ACME_EMAIL")
   fi
   if [[ ${#missing[@]} -gt 0 ]]; then

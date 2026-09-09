@@ -16,9 +16,10 @@ export_env_for_templates
 OUT_FILE="${GENERATED_DIR}/caddy/Caddyfile"
 mkdir -p "$(dirname "${OUT_FILE}")"
 
+[[ -n "${CADDY_ACME_EMAIL:-}" ]] || { echo "ERROR: CADDY_ACME_EMAIL requerido (Let's Encrypt / ACME)" >&2; exit 1; }
+
 case "${TLS_MODE}" in
   domain)
-    [[ -n "${CADDY_ACME_EMAIL:-}" ]] || { echo "ERROR: CADDY_ACME_EMAIL requerido en modo domain" >&2; exit 1; }
     render_template \
       "${KIT_DIR}/templates/Caddyfile.domain.tpl" \
       "${OUT_FILE}" \
@@ -28,7 +29,7 @@ case "${TLS_MODE}" in
     render_template \
       "${KIT_DIR}/templates/Caddyfile.ip.tpl" \
       "${OUT_FILE}" \
-      '$IP_HOSTNAME'
+      '$IP_HOSTNAME $CADDY_ACME_EMAIL'
     ;;
   *)
     echo "ERROR: TLS_MODE inválido: ${TLS_MODE}" >&2

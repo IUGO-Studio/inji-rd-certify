@@ -84,12 +84,14 @@ En el archivo `.env` (sección 4) deje así el bloque de acceso público:
 TLS_MODE=ip
 SERVER_PUBLIC_IP=203.0.113.10
 IP_DNS_PROVIDER=sslip.io
+CADDY_ACME_EMAIL=infra@institucion.gob.do
 ```
 
 - `SERVER_PUBLIC_IP`: la IP pública del servidor donde corre Docker (no una IP interna tipo `192.168.x.x`).
 - `IP_DNS_PROVIDER`: deje `sslip.io` salvo que OGTIC le indique otro valor.
+- `CADDY_ACME_EMAIL`: correo de infraestructura para Let's Encrypt (igual que en modo dominio).
 
-Deje sin usar las líneas de modo dominio (`CERTIFY_PUBLIC_HOST`, `CADDY_ACME_EMAIL`): aunque aparezcan en la plantilla, con `TLS_MODE=ip` el kit no las utiliza.
+Deje sin usar la línea de modo dominio (`CERTIFY_PUBLIC_HOST`): aunque aparezca en la plantilla, con `TLS_MODE=ip` el kit no la utiliza.
 
 El kit convertirá la IP en un nombre usable. Ejemplo: si la IP es `203.0.113.10`, la dirección pública será:
 
@@ -97,7 +99,7 @@ El kit convertirá la IP en un nombre usable. Ejemplo: si la IP es `203.0.113.10
 https://203-0-113-10.sslip.io
 ```
 
-(Los puntos de la IP se reemplazan por guiones.)
+(Los puntos de la IP se reemplazan por guiones.) Caddy pedirá un certificado público a Let's Encrypt para ese hostname; el puerto 80 debe estar abierto.
 
 ---
 
@@ -272,13 +274,15 @@ curl https://certify.institucion.gob.do/.well-known/did.json
 
 ### 6B. Modo IP
 
-Reemplace el hostname por el que derivó el kit (IP con guiones + `.sslip.io`). La opción `-k` es necesaria porque el certificado es generado por el propio servidor:
+Reemplace el hostname por el que derivó el kit (IP con guiones + `.sslip.io`). Si Let's Encrypt emitió el certificado, **no** hace falta `-k`:
 
 ```bash
-curl -k https://203-0-113-10.sslip.io/v1/certify/actuator/health
-curl -k https://203-0-113-10.sslip.io/.well-known/openid-credential-issuer
-curl -k https://203-0-113-10.sslip.io/.well-known/did.json
+curl https://203-0-113-10.sslip.io/v1/certify/actuator/health
+curl https://203-0-113-10.sslip.io/.well-known/openid-credential-issuer
+curl https://203-0-113-10.sslip.io/.well-known/did.json
 ```
+
+Si `curl` marca error de certificado, revise logs de Caddy (`docker compose logs caddy`) y confirme puerto 80 abierto.
 
 ### Qué debe obtener
 
@@ -317,8 +321,8 @@ Hasta que OGTIC confirme el registro, un ciudadano aún no podrá emitir la cred
 | Error porque falta un valor en `.env`, o el secret sigue siendo `REEMPLAZAR_CON_SECRET_DE_OGTIC` | Abra `.env`, complete o corrija el valor, guarde y vuelva a ejecutar `./install.sh` |
 | El health no responde o hay timeout | Espere unos minutos (el primer arranque es lento). Luego revise logs: `docker compose logs certify` |
 | Health responde JSON con `Full authentication is required` | Regenere config y reinicie Certify (`./scripts/generate-properties.sh` y `docker compose up -d --force-recreate certify`). Debe devolver `{"status":"UP"}` |
-| Modo dominio: no obtiene el certificado HTTPS | Confirme con infraestructura que el DNS sigue apuntando al servidor y que el puerto 80 está abierto |
-| Modo IP: la URL no responde desde internet | Confirme que el puerto 443 de la IP pública llega al servidor |
+| Modo dominio o IP: no obtiene el certificado HTTPS | Confirme puerto 80 abierto desde internet. En modo dominio, que el DNS apunte al servidor. En modo IP, que `sslip.io` resuelva a la IP pública. Si antes usó certificado interno, borre el volumen de Caddy (`docker volume rm …_caddy_data`) y reinicie. |
+| Modo IP: la URL no responde desde internet | Confirme que los puertos 80 y 443 de la IP pública llegan al servidor |
 | Mensaje de que no encuentra el complemento RestAPI (archivo `.jar`) | Verifique que clonó el repositorio completo (`inji-rd-certify`) y que existe la carpeta `certify-service/loader_path/certify/` con ese archivo |
 | `docker compose ... no configuration file provided` | Ejecute los comandos desde la carpeta `institution-kit/` (donde está `docker-compose.yml`) |
 

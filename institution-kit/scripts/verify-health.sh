@@ -11,10 +11,8 @@ apply_defaults
 derive_public_url
 export_env_for_templates
 
+# Ambos modos usan Let's Encrypt; sin -k para detectar cert inválido/autofirmado.
 CURL_OPTS=()
-if [[ "${TLS_MODE}" == "ip" ]]; then
-  CURL_OPTS+=(-k)
-fi
 
 BASE_URL="${CERTIFY_PUBLIC_URL}"
 MAX_ATTEMPTS=60

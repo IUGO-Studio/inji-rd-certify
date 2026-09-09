@@ -65,13 +65,16 @@ echo ""
 echo "=== Levantando stack ==="
 docker compose up -d
 
+echo ""
+echo "Caddy solicitará certificado Let's Encrypt (ACME HTTP-01)."
 if [[ "${TLS_MODE}" == "domain" ]]; then
-  echo ""
-  echo "Modo dominio: Caddy solicitará certificado Let's Encrypt (ACME HTTP-01)."
   echo "Asegúrese de que DNS apunta a este servidor y el puerto 80 está abierto."
-  echo "Monitoreando logs de Caddy (30s) ..."
-  timeout 30 docker compose logs -f caddy 2>/dev/null || true
+else
+  echo "Modo IP: hostname ${IP_HOSTNAME:-} debe resolver a este servidor y el puerto 80 debe estar abierto."
+  echo "Si Caddy ya usó certificado interno antes, limpie el volumen: docker compose down && docker volume rm institution-kit_caddy_data"
 fi
+echo "Monitoreando logs de Caddy (30s) ..."
+timeout 30 docker compose logs -f caddy 2>/dev/null || true
 
 echo ""
 echo "=== Verificando endpoints ==="

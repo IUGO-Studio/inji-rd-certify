@@ -1,5 +1,8 @@
-https://$IP_HOSTNAME {
-	tls internal
+{
+	email $CADDY_ACME_EMAIL
+}
+
+$IP_HOSTNAME {
 	route /.well-known/did.json {
 		rewrite * /v1/certify/.well-known/did.json
 		reverse_proxy certify:8090
