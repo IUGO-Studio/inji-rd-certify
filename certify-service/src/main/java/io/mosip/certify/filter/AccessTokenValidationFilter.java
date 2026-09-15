@@ -109,11 +109,14 @@ public class AccessTokenValidationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
+            log.info("Raw access token: {}", token);
             //validate access token no matter if its JWT or Opaque
             if(isJwt(token)) {
                 try {
                     //Verifies signature and claim predicates, If invalid throws exception
                     Jwt jwt = getNimbusJwtDecoder().decode(token);
+                    log.info("Decoded JWT claims: {}", jwt.getClaims());
+                    log.info("Decoded JWT ext claim: {}", jwt.getClaims().get("ext"));
                     parsedAccessToken.setClaims(new HashMap<>());
                     parsedAccessToken.getClaims().putAll(jwt.getClaims());
                     parsedAccessToken.setAccessTokenHash(CommonUtil.generateOIDCAtHash(token));
